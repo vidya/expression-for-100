@@ -1,16 +1,11 @@
 
-#  https://adriann.github.io/programming_problems.html
+# https://adriann.github.io/programming_problems.html
 #
 # Write a program that outputs all possibilities to put + or - or nothing between
 # the numbers 1,2,…,9 (in this order) such that the result is 100.
 # For example 1 + 2 + 3 - 4 + 5 + 6 + 78 + 9 = 100.
 
 require 'pry'
-
-# A test expression is conceived of as a sequence of slots, with each slot containing either a
-# digit(1,2,..,8,9) or one of the symbols in [:empty, :plus, :minus].
-#
-# A test expression is a list containing 9 digit_slots + 8 operator_slots
 
 module ExpressionUtil
   def to_s
@@ -19,9 +14,9 @@ module ExpressionUtil
         memo << "#{s}"
       else
         memo << {
-            empty: '',
-            plus: ' + ',
-            minus: ' - '
+            empty:  '',
+            plus:   ' + ',
+            minus:  ' - '
         }[s]
       end
     end
@@ -98,10 +93,8 @@ class SmallExpression
 
         result -= next_term
       end
-      # binding.pry
     end
 
-    # binding.pry
     result
   end
 end
@@ -142,7 +135,6 @@ class TestExpression
       op_at_position = op_list[position]
 
       if op_at_position.eql?(:minus)
-        # binding.pry
         position -= 1
         next
       else
@@ -187,6 +179,7 @@ class TestExpression
     count = 0
     new_expression = nil
     hundred_exp_count = 0
+
     loop do
       break if expression.is_last_expression?
 
@@ -202,15 +195,12 @@ class TestExpression
         puts
       end
 
-
       new_expression = expression.next_expression()
-      # binding.pry
+
       expression = new_expression
 
       count += 1
     end
-
-    # binding.pry
   end
   #-- end: class methods
   
