@@ -118,9 +118,16 @@ describe TestExpression do
     end
   end
 
-  it "gets an expression with value 100" do
-    TestExpression.with_value_100()
-    true
+  it "finds the example expression with value 100 mentioned in problem specification" do
+    # expression: 1 + 2 + 3 - 4 + 5 + 6 + 78 + 9
+    sample_expression = TestExpression.new([
+                                    :plus,  :plus,  :minus,
+                                    :plus,  :plus,  :plus,
+                                    :empty, :plus
+                                  ])
+    value_100_expressions = TestExpression.get_value_100_expressions()
+
+    expect(value_100_expressions).to include(sample_expression)
   end
 end
 
