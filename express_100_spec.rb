@@ -11,7 +11,6 @@ describe TestExpression do
     @operators = slots.partition { |s| s.is_a? Symbol }.first
   end
 
-  #---
   it "should return a next expression correctly" do
     te = TestExpression.new([
                               :empty,  :minus,  :minus,
@@ -34,10 +33,9 @@ describe TestExpression do
                               :empty,  :plus,  :minus,
                               :empty,  :empty
                             ])
-    # binding.pry
+
     expect(te.value()).to eq(11562)
   end
-  #---
 
   it "should have 8 operators" do
     expect(operators.size).to eq(8)
@@ -52,8 +50,6 @@ describe TestExpression do
 
     te = TestExpression.new(operator_list)
     @digits, @operators = te.slots.partition { |s| s.is_a? Fixnum }
-
-    # puts "343 -- te: #{te}"
 
     expect(digits.size).to eq(9)
     expect(operators.size).to eq(8)
@@ -120,13 +116,6 @@ describe TestExpression do
 
       expect(te.next_expression == next_te).to be_truthy
     end
-  end
-
-  context "when finding expressions with a value of 100" do
-    # it "gets the value of first five expressions" do
-    #   TestExpression.with_value_100()
-    #   true
-    # end
   end
 
   it "gets an expression with value 100" do
