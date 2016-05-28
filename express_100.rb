@@ -40,7 +40,7 @@ class SmallExpression
     # all but the last digit is preceded by an operator
     (1...digit_count).each do |n|
       terms << n
-      terms << operators.shift #unless operators.empty?
+      terms << operators.shift
     end
 
     # append the last digit
@@ -55,9 +55,7 @@ class SmallExpression
 
     result = tmp_terms.shift
 
-    loop do
-      break if tmp_terms.empty?
-
+    until tmp_terms.empty?
       operator = tmp_terms.shift
 
       case operator
@@ -67,8 +65,7 @@ class SmallExpression
 
       when :plus
         next_term = tmp_terms.shift
-        loop do
-          break if tmp_terms.empty?
+        until tmp_terms.empty?
           break unless tmp_terms.first.eql?(:empty)
 
           next_term *= 10
@@ -81,8 +78,7 @@ class SmallExpression
 
       when :minus
         next_term = tmp_terms.shift
-        loop do
-          break if tmp_terms.empty?
+        until tmp_terms.empty? do
           break unless tmp_terms.first.eql?(:empty)
 
           next_term *= 10
@@ -116,7 +112,6 @@ class TestExpression
   def is_last_expression?
     # are all operators :minus?
     # note that operators are arranged as [:empty, :plus, :minus]
-    # operators.all? { |op| op.eql?(:minus) }
     operator_list().all? { |op| op.eql?(:minus) }
   end
 
@@ -155,7 +150,6 @@ class TestExpression
       end
     end
 
-    binding.pry
     raise "ERROR: next_express(): unexpected flow of control" unless pos_to_modify
   end
 
@@ -169,19 +163,19 @@ class TestExpression
   end
 
   #--- begin: class methods
-  def self.with_value_100()
+  def self.get_value_100_expressions()
+    value_100_expressions = []
+
     expression = TestExpression.new([
-                                            :empty,  :empty,  :empty,
-                                            :empty,  :empty,  :empty,
-                                            :empty,  :empty
-                                          ])
+                                      :empty,  :empty,  :empty,
+                                      :empty,  :empty,  :empty,
+                                      :empty,  :empty
+                                    ])
 
     count = 0
-    new_expression = nil
     hundred_exp_count = 0
 
-    loop do
-      break if expression.is_last_expression?
+    until expression.is_last_expression?
 
       # puts "(count, value, expression) = (#{count}, #{expression.value}, #{expression.to_s})"
 
@@ -193,14 +187,16 @@ class TestExpression
         puts "(count, value, expression) = (#{count}, #{expression.value}, #{expression.to_s})"
         puts "-----------------------------------------------------------------------"
         puts
+
+        value_100_expressions << expression
       end
 
-      new_expression = expression.next_expression()
-
-      expression = new_expression
+      expression = expression.next_expression()
 
       count += 1
     end
+
+    value_100_expressions
   end
   #-- end: class methods
   
