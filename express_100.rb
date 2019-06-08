@@ -8,16 +8,18 @@
 require 'pry'
 
 module ExpressionUtil
-  def to_s
+  OP_STRING = {
+    empty:  '',
+    plus:   ' + ',
+    minus:  ' - '
+  }
+
+def to_s
     slots.reduce("expression: ") do |memo, s|
       if s.is_a?(Fixnum)
         memo << "#{s}"
       else
-        memo << {
-            empty:  '',
-            plus:   ' + ',
-            minus:  ' - '
-        }[s]
+        memo << OP_STRING[s]
       end
     end
   end
@@ -35,12 +37,10 @@ class SmallExpression
     raise "Error: not enough digits: (digit_count, operator_count) = (#{digit_count}, #{operators.size})" \
       unless operators.size.eql?(digit_count  - 1)
 
-    @terms = []
-
     # all but the last digit is preceded by an operator
-    (1...digit_count).each do |n|
-      terms << n
-      terms << operators.shift
+    @terms = (1...digit_count).reduce([]) do |m, dc|
+      m << dc
+      m << operators.shift
     end
 
     # append the last digit
@@ -54,7 +54,6 @@ class SmallExpression
     tmp_terms = terms.dup
 
     result = tmp_terms.shift
-
     until tmp_terms.empty?
       operator = tmp_terms.shift
 
@@ -153,6 +152,40 @@ class TestExpression
     raise "ERROR: next_express(): unexpected flow of control" unless pos_to_modify
   end
 
+  def new_next_expression
+    return nil if is_last_expression?
+
+    op_list = operator_list()
+    new_op_list = op_list.dup
+
+    position = op_list.size - 1
+    while (position >= 0)  do
+      op_at_position = op_list[position]
+
+      if op_at_position.eql?(:minus)
+        position -= 1
+        next
+      else
+        # replace operator at position with the next one
+        # in the sequence [:empty, : plus, :minus]
+
+        new_op_list[position] = {
+                      :empty  => :plus,
+                      :plus   => :minus,
+                    }[op_at_position]
+
+        # in the subsequent positions, start over with :empty
+        ((position + 1)..8).each { |pos| new_op_list[pos] = :empty }
+
+        new_te = TestExpression.new(new_op_list)
+
+        yield new_te
+      end
+    end
+
+    raise "ERROR: next_express(): unexpected flow of control" unless pos_to_modify
+  end
+
   def ==(other_expression)
     operator_list.eql?(other_expression.operator_list)
   end
@@ -162,8 +195,43 @@ class TestExpression
     se.value()
   end
 
-  #--- begin: class methods
+  def self.generate_100_expression
+    expression = TestExpression.new([
+      :empty,  :empty,  :empty,
+      :empty,  :empty,  :empty,
+      :empty,  :empty
+    ])
+
+    count = 0
+    hundred_exp_count = 0
+    until expression.is_last_expression?
+      if expression.value.eql?(100)
+        hundred_exp_count += 1
+        yield hundred_exp_count, count, expression
+      end
+
+      expression = expression.next_expression()
+      count += 1
+    end
+  end
+
   def self.get_value_100_expressions()
+    value_100_expressions = []
+
+    generate_100_expression do |hundred_exp_count, count, expression|
+      puts
+      puts "--- #{hundred_exp_count} --------------------------------------------------------------------"
+      puts "(count, value, expression) = (#{count}, #{expression.value}, #{expression.to_s})"
+      puts "-----------------------------------------------------------------------"
+      puts
+
+      value_100_expressions << expression
+    end
+
+    value_100_expressions
+  end
+  
+  def self.old_get_value_100_expressions()
     value_100_expressions = []
 
     expression = TestExpression.new([
@@ -192,13 +260,11 @@ class TestExpression
       end
 
       expression = expression.next_expression()
-
       count += 1
-    end
+     end
 
     value_100_expressions
   end
-  #-- end: class methods
   
 end
 
