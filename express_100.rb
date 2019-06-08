@@ -129,7 +129,6 @@ class TestExpression
 
     generate_100_expression do |count, expression|
       puts "#{count}:  #{expression.to_s} = #{expression.value}"
-
       value_100_expressions << expression
     end
 
