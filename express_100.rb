@@ -58,16 +58,13 @@ class TestExpression
       when :empty
         ops[n] = :plus
         empty_to_right.(n)
-
         return TestExpression.new(ops)
 
       when :plus
         ops[n] = :minus
         empty_to_right.(n)
-
         return TestExpression.new(ops)
 
-      # when :minus
       else
         next
       end
@@ -84,6 +81,7 @@ class TestExpression
     pos = 0
 
     next_num = -> do
+      # slots[pos] is a digit
       tnum = slots[pos]
 
       while pos < slots.size
@@ -103,11 +101,8 @@ class TestExpression
         sign = slots[pos]
         pos += 1
 
-        if sign.eql?(:plus)
-          num += next_num.()
-        else
-          num -= next_num.()
-        end
+        num += next_num.() if sign.eql?(:plus)
+        num -= next_num.() if sign.eql?(:minus)
       end
     end
 
