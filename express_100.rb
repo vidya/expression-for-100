@@ -14,7 +14,7 @@ module ExpressionUtil
   }
 
   def to_s
-    slots.reduce("expression: ") do |memo, s|
+    slots.reduce("") do |memo, s|
       if s.is_a?(Fixnum)
         memo << "#{s}"
       else
@@ -36,20 +36,20 @@ class TestExpression
     @slots << 9
   end
 
-  def operator_list
+  def operators
     slots.select { |s| s.is_a? Symbol }
   end
 
   def is_last_expression?
     # are all operators :minus?
     # note that operators are arranged as [:empty, :plus, :minus]
-    operator_list.all? { |op| op.eql?(:minus) }
+    operators.all? { |op| op.eql?(:minus) }
   end
 
   def next_expression
     return nil if is_last_expression?
 
-    ops = operator_list
+    ops = operators
 
     empty_to_right = -> n { (n + 1).upto(ops.size) { |k| ops[k] = :empty }}
 
@@ -74,7 +74,7 @@ class TestExpression
   end
 
   def ==(other_expression)
-    operator_list.eql?(other_expression.operator_list)
+    operators.eql?(other_expression.operators)
   end
 
   def value
@@ -93,6 +93,7 @@ class TestExpression
       end
     end
 
+    num = nil
     while pos < slots.size
       if slots[pos].is_a?(Fixnum)
         num = next_num.()
@@ -110,34 +111,24 @@ class TestExpression
   end
 
   def self.generate_100_expression
-    expression = TestExpression.new([
-                                        :empty,  :empty,  :empty,
-                                        :empty,  :empty,  :empty,
-                                        :empty,  :empty
-                                    ])
+    expression = TestExpression.new([:empty] * 8)
 
     count = 0
-    hundred_exp_count = 0
     until expression.is_last_expression?
       if expression.value.eql?(100)
-        hundred_exp_count += 1
-        yield hundred_exp_count, count, expression
+        count += 1
+        yield count, expression
       end
 
       expression = expression.next_expression
-      count += 1
     end
   end
 
   def self.get_value_100_expressions()
     value_100_expressions = []
 
-    generate_100_expression do |hundred_exp_count, count, expression|
-      puts
-      puts "--- #{hundred_exp_count} --------------------------------------------------------------------"
-      puts "(count, value, expression) = (#{count}, #{expression.value}, #{expression.to_s})"
-      puts "-----------------------------------------------------------------------"
-      puts
+    generate_100_expression do |count, expression|
+      puts "#{count}:  #{expression.to_s} = #{expression.value}"
 
       value_100_expressions << expression
     end
